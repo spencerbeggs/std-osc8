@@ -1,0 +1,34 @@
+{
+	"$schema": "https://spencerbegg.gs/schemas/design-config/1.0.0/schema.json",
+	"version": "1.0.0",
+	"project": {
+		"name": "std-osc8",
+		"type": "package",
+		"repository": "https://github.com/spencerbeggs/std-osc8",
+		"maintainer": "C. Spencer Beggs"
+	},
+	"paths": {
+		"designDocs": ".claude/design",
+		"plans": ".claude/plans",
+		"skills": ".claude/skills",
+		"context": "CLAUDE.md",
+		"localContext": "CLAUDE.local.md"
+	},
+	"modules": {
+		"std-osc8": {
+			"path": ".",
+			"designDocsPath": ".claude/design/std-osc8",
+			"categories": ["architecture", "integration", "other"],
+			"maintainer": "C. Spencer Beggs"
+		}
+	},
+	"quality": {
+		"designDocs": {
+			"maxLineLength": 120,
+			"requireFrontmatter": true,
+			"requireTOC": true,
+			"minSections": ["Overview", "Current State", "Rationale"],
+			"maxStaleDays": 30
+		}
+	}
+}

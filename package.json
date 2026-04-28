@@ -1,15 +1,41 @@
 {
-	"name": "@spencerbeggs/pnpm-module-template",
+	"name": "std-osc8",
 	"version": "0.0.0",
 	"private": true,
-	"description": "A template repository for developing and deploying Node.js modules from a pnpm monorepo structure.",
-	"homepage": "https://github.com/spencerbeggs/pnpm-module-template#readme",
+	"description": "Detect terminal hyperlink capabilities of the active terminal from environmental variables",
+	"keywords": [
+		"osc8",
+		"hyperlink",
+		"hyperlinks",
+		"terminal",
+		"tty",
+		"ansi",
+		"ansi-escape",
+		"escape-codes",
+		"link",
+		"clickable",
+		"detection",
+		"std-env",
+		"cli",
+		"console",
+		"esm",
+		"typescript",
+		"iterm",
+		"wezterm",
+		"kitty",
+		"vte",
+		"konsole",
+		"alacritty",
+		"ghostty",
+		"vscode-terminal"
+	],
+	"homepage": "https://github.com/spencerbeggs/std-osc8#readme",
 	"bugs": {
-		"url": "https://github.com/spencerbeggs/pnpm-module-template/issues"
+		"url": "https://github.com/spencerbeggs/std-osc8/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/spencerbeggs/pnpm-module-template.git"
+		"url": "git+https://github.com/spencerbeggs/std-osc8.git"
 	},
 	"license": "MIT",
 	"author": {
@@ -19,7 +45,8 @@
 	},
 	"type": "module",
 	"exports": {
-		".": "./src/index.ts"
+		".": "./src/index.ts",
+		"./package.json": "./package.json"
 	},
 	"scripts": {
 		"build": "turbo run build:dev build:prod --log-order=grouped --log-prefix=none",
@@ -44,7 +71,7 @@
 	},
 	"devDependencies": {
 		"@savvy-web/changesets": "^0.8.0",
-		"@savvy-web/commitlint": "^0.6.0",
+		"@savvy-web/commitlint": "^0.7.0",
 		"@savvy-web/lint-staged": "^1.0.0",
 		"@savvy-web/rslib-builder": "^0.20.3",
 		"@savvy-web/vitest": "^1.3.1"
@@ -72,7 +99,7 @@
 			{
 				"protocol": "npm",
 				"registry": "https://npm.pkg.github.com/",
-				"directory": "dist/npm",
+				"directory": "dist/github",
 				"access": "public",
 				"provenance": true
 			},

@@ -1,74 +1,119 @@
-# pnpm-module-template
+# std-osc8
 
-A personal template repository by
-[C. Spencer Beggs](https://spencerbeg.gs) for developing and publishing Node.js
-modules to [npm](https://www.npmjs.com/) and
-[GitHub Packages](https://github.com/features/packages).
+[![npm version](https://img.shields.io/npm/v/reposets)](https://www.npmjs.com/package/std-osc8)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue.svg)](https://www.typescriptlang.org/)
 
-You're welcome to clone or fork this template for your own use.
+Detect terminal hyperlink (OSC8) support and emit hyperlinks (or graceful fallbacks). A focused, sync, ESM-only complement to [`unjs/std-env`](https://github.com/unjs/std-env). Zero runtime dependencies.
 
-## What's Included
+```ts
+import { link } from "std-osc8";
 
-- **Build pipeline** — Dual-output builds (development + production) via
-  [Rslib](https://rslib.rs/) with automatic `package.json` transformation for
-  publishing
-- **Code quality** — [Biome](https://biomejs.dev/) for linting and formatting,
-  with git hooks for pre-commit checks and commit message validation
-- **Testing** — [Vitest](https://vitest.dev/) with v8 coverage
-- **Versioning** — [Changesets](https://github.com/changesets/changesets) for
-  version management and changelog generation
-- **CI/CD** — GitHub Actions for automated testing, building, and publishing
-  with provenance attestation
-- **TypeScript** — Strict mode, composite builds, ESM-first with `.js` import
-  extensions
-
-## Quick Start
-
-1. Click **"Use this template"** on GitHub (or clone the repo directly)
-2. Update `package.json` with your package name, repository URL, and homepage
-3. Update the `repo` field in `.changeset/config.json`
-4. Replace the placeholder code in `src/` with your own
-5. Install dependencies:
-
-   ```bash
-   pnpm install
-   ```
-
-6. Start developing:
-
-   ```bash
-   pnpm run test:watch    # Run tests in watch mode
-   pnpm run lint:fix      # Auto-fix lint issues
-   pnpm run build         # Build dev + prod outputs
-   ```
-
-## Project Structure
-
-```text
-src/               Source code and tests
-lib/configs/       Shared tool configurations (commitlint, lint-staged, markdownlint)
-dist/dev/          Development build output
-dist/npm/          Production build output (published to registries)
-.github/workflows/ CI/CD workflows
-.changeset/        Changeset configuration
+console.log(link("the docs", "https://example.com"));
+// In an OSC8-supporting terminal (iTerm, WezTerm, kitty, Konsole, …):
+//   the docs       ← a clickable hyperlink
+// In a non-supporting terminal, inside tmux without passthrough,
+// in CI, or when stdout is piped to a file:
+//   the docs (https://example.com)
 ```
 
-## Publishing
+`std-osc8` does the detection for you. You write `link(label, url)` once, and it picks the right rendering across iTerm2, WezTerm, kitty, VS Code, Windows Terminal, GNOME Terminal, Konsole, mintty, and 13 other identifiable terminals — falling back to plain text inside `tmux` / `screen`, in CI, when stdout is piped, or when `NO_COLOR` is set.
 
-Packages are published to both npm and GitHub Packages with provenance
-attestation. The build pipeline automatically transforms `package.json` for
-publishing — the source file stays `"private": true` and the builder handles the
-rest.
+## Install
 
-See the [Changesets documentation](https://github.com/changesets/changesets) for
-how versioning and releases work.
+```bash
+pnpm add std-osc8
+# or
+npm install std-osc8
+```
 
-## Claude Code
+## At a glance
 
-This template includes configuration for
-[Claude Code](https://docs.anthropic.com/en/docs/claude-code). See
-[CLAUDE.md](CLAUDE.md) for details on the design-first development workflow.
+```ts
+import {
+  link,
+  openHyperlink,
+  closeHyperlink,
+  supportsHyperlinks,
+  supportsHyperlinksStderr,
+  supportsHyperlinksFor,
+  osc8,
+} from "std-osc8";
+
+// Most common: render a hyperlink with automatic fallback
+link("docs", "https://example.com");
+
+// Boolean check — eager, computed once at module import (for stdout)
+if (supportsHyperlinks) {
+  // emit fancy output
+}
+
+// Per-stream check — function form, accepts WriteStream-like or numeric fd
+supportsHyperlinksFor(process.stderr); // boolean
+supportsHyperlinksFor(2);              // boolean
+
+// Diagnostic info — what was detected and why
+osc8.terminal;        // "iTerm.app" | "WezTerm" | "kitty" | … | null
+osc8.terminalVersion; // "3.5.0" | … | null
+osc8.reason;          // "terminal-known-supported" | "wrapper-strips" | "not-a-tty" | …
+osc8.capabilities;    // { params, fileUrls, fileUrlsRemoteUnsafe }
+osc8.wrapper;         // { name: "tmux" | "screen", passesThrough } | null
+
+// Streaming open/close pair — for progress bars, word-wrapped labels,
+// anything where the linked text is built up across multiple writes
+process.stdout.write(openHyperlink("https://example.com", { id: "n1" }));
+process.stdout.write("docs");
+process.stdout.write(closeHyperlink());
+```
+
+Full surface in the [API reference](./docs/api-reference.md).
+
+## Customizing the fallback
+
+```ts
+link("docs", "https://example.com");
+//   "docs (https://example.com)"   ← default ("with-url")
+
+link("docs", "https://example.com", { fallback: "label-only" });
+//   "docs"
+
+link("docs", "https://example.com", { fallback: "url-only" });
+//   "https://example.com"
+
+link("docs", "https://example.com", {
+  fallback: (label, url) => `[${label}](${url})`, // markdown-ish
+});
+//   "[docs](https://example.com)"
+```
+
+You can also force the rendering decision with `enabled`:
+
+```ts
+link("docs", "https://example.com", { enabled: true });  // always emit OSC8
+link("docs", "https://example.com", { enabled: false }); // always use fallback
+```
+
+## Override env vars
+
+| Variable | Effect |
+| --- | --- |
+| `FORCE_HYPERLINK=1` | Force on. Overrides not-a-tty and wrapper checks. |
+| `NO_HYPERLINK=1` | Force off. |
+| `NO_COLOR=1` | Force off (per [no-color.org](https://no-color.org) spec, any non-empty value is truthy — including `"0"`). |
+
+Precedence: `FORCE_HYPERLINK > NO_HYPERLINK > NO_COLOR > not-a-TTY > wrapper > terminal allowlist`.
+
+See [Detection Algorithm](./docs/detection.md) for the full 7-rule ladder and the rationale per rule.
+
+## Documentation
+
+- [Getting Started](./docs/getting-started.md) — install, mental model, four worked scenarios
+- [API Reference](./docs/api-reference.md) — every export and type with examples
+- [Detection Algorithm](./docs/detection.md) — precedence ladder, override semantics, reason codes
+- [Terminal Allowlist](./docs/terminals.md) — the 21 entries, sourcing, contributing
+- [Comparison with Similar Packages](./docs/comparison.md) — vs `supports-hyperlinks`, `terminal-link`, `ansi-escapes`, `std-env`
+- [Troubleshooting](./docs/troubleshooting.md) — common stumbling blocks with concrete fixes
 
 ## License
 
-[MIT](LICENSE)
+[MIT](./LICENSE)

@@ -3,32 +3,50 @@
 This file provides guidance to Claude Code when working with code in this
 repository.
 
+## Package Overview
+
+`std-osc8` is a focused, synchronous, ESM-only complement to
+[`unjs/std-env`](https://github.com/unjs/std-env) that answers one question:
+"should I emit an OSC8 hyperlink to this stream?" It exposes a 3-tier API —
+eager constants (`supportsHyperlinks`, `supportsHyperlinksStderr`, plus the
+diagnostic `osc8: Osc8Info` record) and a function form
+(`supportsHyperlinksFor(stream | fd)`) — plus formatter helpers (`link`,
+`openHyperlink`, `closeHyperlink`). Detection reads only `process.env` and
+`isTTY`; no subprocesses are spawned and no Effect runtime is exposed from the
+public surface.
+
 ## Project Status
 
-This is a **base template repository** for developing and publishing Node.js
-modules to npm and GitHub Packages. It is not a working library — it contains
-placeholder source code in `src/` that should be replaced when starting a new
-project.
+`std-osc8` is a working library, not a template. Implementation is complete,
+the test suite passes, and builds run cleanly via Rslib. Future feature work
+should follow the design-first workflow described below.
 
-The design documentation system is available via Claude Code skills and agents
-but no design docs exist yet in this template.
+## Working with This Codebase
 
-## Getting Started (After Cloning This Template)
+The canonical source of architectural truth lives in `.claude/design/std-osc8/`.
+Always consult these design docs before modifying behavior — do not infer
+architecture from source alone, and do not edit `docs/superpowers/` (gitignored
+scratch space; not authoritative).
 
-When starting a new project from this template, follow this lifecycle:
+**Load design docs when working on the corresponding area:**
 
-1. **Rename the package** — Update `name` in `package.json` (e.g.,
-   `@spencerbeggs/my-new-lib`), update `repository.url` and `homepage`, and
-   update the `repo` field in `.changeset/config.json`
-2. **Replace placeholder code** — Delete the example `Foo`/`Bar` code in
-   `src/index.ts` and `src/index.test.ts`
-3. **Initialize design documentation** — Run `/design-init` to create your
-   first design document describing the library's architecture
-4. **Follow the design-first workflow** — Design docs → `/plan-create` →
-   implementation. This ensures Claude understands the full architecture before
-   writing code
-5. **Implement iteratively** — Use the plan to guide implementation, updating
-   design docs as the architecture evolves
+- Architecture, module layout, public API tiers
+  → `@./.claude/design/std-osc8/architecture.md`
+- Detection rules, precedence ladder, env var semantics
+  → `@./.claude/design/std-osc8/detection-precedence.md`
+- Terminal allowlist entries, sourcing rules, version gates
+  → `@./.claude/design/std-osc8/terminal-allowlist.md`
+- Scope boundaries — what this package will and will not do
+  → `@./.claude/design/std-osc8/out-of-scope.md`
+
+**Design-first workflow for new features:**
+
+1. Update or add a design doc in `.claude/design/std-osc8/` describing the
+   change.
+2. Run `/plan-create` to produce an implementation plan grounded in the design.
+3. Implement against the plan; update the design doc as the architecture
+   evolves.
+4. Update `__test__/` coverage and run `pnpm run test` before committing.
 
 ## Build Pipeline
 
@@ -75,7 +93,7 @@ Both targets publish with provenance attestation enabled.
 
 ## Savvy-Web Tool References
 
-This template depends on several `@savvy-web/*` packages. These are in active
+This project depends on several `@savvy-web/*` packages. These are in active
 development — if behavior seems unexpected, explore both the GitHub docs and the
 installed source.
 

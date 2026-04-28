@@ -1,18 +1,23 @@
-/**
- * \@savvy-web/example-module
- *
- * Version-aware type definition registry for TypeScript documentation with Twoslash.
- * Built with Effect for robust error handling and composable async operations.
- *
- * @packageDocumentation
- */
+// src/index.ts
 
-export interface Foo {
-	baz: number;
-}
+// Eager constants + per-stream function form
+export {
+	osc8,
+	supportsHyperlinks,
+	supportsHyperlinksFor,
+	supportsHyperlinksStderr,
+} from "./constants.js";
 
-export class Bar {
-	qux(): Foo {
-		return { baz: 42 };
-	}
-}
+// Formatter helpers
+export { closeHyperlink, link, openHyperlink } from "./link.js";
+
+// Public types
+export type {
+	KnownTerminal,
+	LinkOptions,
+	Osc8Capabilities,
+	Osc8Info,
+	Osc8Params,
+	Osc8Reason,
+	WrapperInfo,
+} from "./types.js";

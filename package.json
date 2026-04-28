@@ -1,15 +1,15 @@
 {
-	"name": "@spencerbeggs/pnpm-module-template",
+	"name": "std-osc8",
 	"version": "0.0.0",
 	"private": true,
-	"description": "A template repository for developing and deploying Node.js modules from a pnpm monorepo structure.",
-	"homepage": "https://github.com/spencerbeggs/pnpm-module-template#readme",
+	"description": "Detect terminal hyperlink capabilities of the active terminal from environmental variables",
+	"homepage": "https://github.com/spencerbeggs/std-osc8#readme",
 	"bugs": {
-		"url": "https://github.com/spencerbeggs/pnpm-module-template/issues"
+		"url": "https://github.com/spencerbeggs/std-osc8/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/spencerbeggs/pnpm-module-template.git"
+		"url": "git+https://github.com/spencerbeggs/std-osc8.git"
 	},
 	"license": "MIT",
 	"author": {
@@ -19,7 +19,8 @@
 	},
 	"type": "module",
 	"exports": {
-		".": "./src/index.ts"
+		".": "./src/index.ts",
+		"./package.json": "./package.json"
 	},
 	"scripts": {
 		"build": "turbo run build:dev build:prod --log-order=grouped --log-prefix=none",
@@ -72,7 +73,7 @@
 			{
 				"protocol": "npm",
 				"registry": "https://npm.pkg.github.com/",
-				"directory": "dist/npm",
+				"directory": "dist/github",
 				"access": "public",
 				"provenance": true
 			},

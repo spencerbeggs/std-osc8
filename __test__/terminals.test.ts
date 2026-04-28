@@ -106,10 +106,12 @@ describe("lookupTerminal", () => {
 	});
 
 	describe("Alacritty", () => {
-		it("identifies via TERM=alacritty", () => {
+		it("identifies via TERM=alacritty with no version gate", () => {
 			const m = lookupTerminal(envFor.alacritty() as NodeJS.ProcessEnv);
 			expect(m?.entry.name).toBe("Alacritty");
-			expect(m?.entry.minVersion).toBe("0.13.0");
+			// minVersion is null because TERM=alacritty carries no version info;
+			// gating on a minVersion would falsely reject every Alacritty user.
+			expect(m?.entry.minVersion).toBe(null);
 		});
 	});
 

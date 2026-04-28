@@ -152,9 +152,10 @@ The capability gate works as follows:
 - **If `options.enabled` is set**, that boolean is used directly — no
   detection is run for the gate.
 - **Params emission is gated** on `osc8.capabilities.params` (the detected
-  terminal's capability), **except** when `options.enabled === true`. In
-  that explicit-on case, params are emitted unconditionally — useful for
-  test rigs and forced-on environments where you want full control.
+  terminal's intrinsic capability — not affected by stream TTY state),
+  **except** when `options.enabled === true`. In that explicit-on case,
+  params are emitted unconditionally — useful for test rigs and forced-on
+  environments where you want full control.
 
 Examples:
 
@@ -299,7 +300,7 @@ interface Osc8Info {
 | `isStdoutTTY` | Whether stdout was a TTY at detection time. |
 | `isStderrTTY` | Whether stderr was a TTY at detection time. |
 | `override` | Which override env var produced the verdict, if any. `null` when no override fired. |
-| `capabilities` | Sub-feature capabilities of the matched terminal. See [`Osc8Capabilities`](#osc8capabilities). |
+| `capabilities` | Sub-feature capabilities of the matched terminal. **Decoupled from `supported`**: capabilities reflect what the detected terminal can intrinsically do, regardless of TTY state, wrapper, or override. A piped stdout that produces `supported: false` still surfaces the terminal's true `params`/`fileUrls` flags here. See [`Osc8Capabilities`](#osc8capabilities). |
 
 ```ts
 import { osc8 } from "std-osc8";

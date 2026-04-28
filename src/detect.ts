@@ -49,6 +49,41 @@ const explanationFor = (
 	}
 };
 
+/** Outcome of running the precedence gate for a single stream's TTY state. */
+interface Gate {
+	readonly supported: boolean;
+	readonly reason: Osc8Reason;
+	readonly override: Osc8Info["override"];
+}
+
+/**
+ * Run the 7-rule precedence ladder for a single stream's TTY state.
+ * Shared by stdout and stderr so the two paths cannot drift.
+ */
+const evaluateGate = (
+	isTTY: boolean,
+	force: boolean,
+	noHyperlink: boolean,
+	noColor: boolean,
+	wrapper: WrapperInfo | null,
+	match: TerminalMatch | null,
+): Gate => {
+	if (force) return { supported: true, reason: "force-env", override: "force-hyperlink" };
+	if (noHyperlink) return { supported: false, reason: "no-hyperlink-env", override: "no-hyperlink" };
+	if (noColor) return { supported: false, reason: "no-color-env", override: "no-color" };
+	if (!isTTY) return { supported: false, reason: "not-a-tty", override: null };
+	if (wrapper) return { supported: false, reason: "wrapper-strips", override: null };
+	if (!match) return { supported: false, reason: "terminal-unknown", override: null };
+	if (!match.entry.supported) return { supported: false, reason: "terminal-known-unsupported", override: null };
+	if (
+		match.entry.minVersion &&
+		(match.identify.version === null || compareSemver(match.identify.version, match.entry.minVersion) < 0)
+	) {
+		return { supported: false, reason: "terminal-known-too-old", override: null };
+	}
+	return { supported: true, reason: "terminal-known-supported", override: null };
+};
+
 /**
  * Determine OSC8 support from a process snapshot. Pure: same input ⇒ same
  * output. The eager constants are `detect(readProcessSnapshot())`; the
@@ -67,83 +102,28 @@ export const detect = (snap: ProcessSnapshot): Osc8Info => {
 	const terminalRaw = match?.identify.rawIdentifier ?? null;
 	const terminalVersion = match?.identify.version ?? null;
 
-	let supported: boolean;
-	let reason: Osc8Reason;
-	let override: Osc8Info["override"] = null;
-	let capabilities: Osc8Capabilities = NO_CAPS;
+	const stdout = evaluateGate(isStdoutTTY, force, noHyperlink, noColor, wrapper, match);
+	const stderr = evaluateGate(isStderrTTY, force, noHyperlink, noColor, wrapper, match);
 
-	if (force) {
-		supported = true;
-		reason = "force-env";
-		override = "force-hyperlink";
-		// When forced, surface capabilities of detected terminal if any,
-		// else NO_CAPS.
-		if (match?.entry.supported) capabilities = match.entry.capabilities;
-	} else if (noHyperlink) {
-		supported = false;
-		reason = "no-hyperlink-env";
-		override = "no-hyperlink";
-	} else if (noColor) {
-		supported = false;
-		reason = "no-color-env";
-		override = "no-color";
-	} else if (!isStdoutTTY) {
-		supported = false;
-		reason = "not-a-tty";
-	} else if (wrapper) {
-		supported = false;
-		reason = "wrapper-strips";
-	} else if (match) {
-		if (!match.entry.supported) {
-			supported = false;
-			reason = "terminal-known-unsupported";
-		} else if (
-			match.entry.minVersion &&
-			(match.identify.version === null || compareSemver(match.identify.version, match.entry.minVersion) < 0)
-		) {
-			supported = false;
-			reason = "terminal-known-too-old";
-		} else {
-			supported = true;
-			reason = "terminal-known-supported";
-			capabilities = match.entry.capabilities;
-		}
-	} else {
-		supported = false;
-		reason = "terminal-unknown";
-	}
-
-	// supportedForStderr: re-run the gate logic for stderr only.
-	// Overrides + wrapper checks share the same answer; the only divergence
-	// is the not-a-tty branch.
-	const stderrSupported = (() => {
-		if (force) return true;
-		if (noHyperlink || noColor) return false;
-		if (!isStderrTTY) return false;
-		if (wrapper) return false;
-		if (!match) return false;
-		if (!match.entry.supported) return false;
-		if (
-			match.entry.minVersion &&
-			(match.identify.version === null || compareSemver(match.identify.version, match.entry.minVersion) < 0)
-		) {
-			return false;
-		}
-		return true;
-	})();
+	// Capabilities are an intrinsic property of the detected terminal — not
+	// gated by stream TTY state. A piped stdout still tells us the terminal
+	// has params support; the gate decides whether to USE them. Without
+	// this decoupling, callers targeting stderr would see params silently
+	// dropped whenever stdout happens to be piped.
+	const capabilities: Osc8Capabilities = match?.entry.capabilities ?? NO_CAPS;
 
 	return {
-		supported,
-		supportedForStderr: stderrSupported,
-		reason,
-		explanation: explanationFor(reason, terminal, terminalVersion, wrapper),
+		supported: stdout.supported,
+		supportedForStderr: stderr.supported,
+		reason: stdout.reason,
+		explanation: explanationFor(stdout.reason, terminal, terminalVersion, wrapper),
 		terminal,
 		terminalRaw,
 		terminalVersion,
 		wrapper,
 		isStdoutTTY,
 		isStderrTTY,
-		override,
+		override: stdout.override,
 		capabilities,
 	};
 };

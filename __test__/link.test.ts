@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { link } from "../src/link.js";
 
 const URL = "https://example.com";
@@ -39,5 +39,40 @@ describe("link — when disabled (fallback)", () => {
 	});
 	it("validation still throws even when disabled", () => {
 		expect(() => link("docs", URL, { enabled: false, params: { id: "a;b" } })).toThrow(TypeError);
+	});
+});
+
+describe("link — capabilities decoupled from stream TTY state", () => {
+	// Regression: when stdout is piped (not a TTY) but stderr is a TTY and
+	// the terminal supports params (e.g. iTerm), `link` targeting stderr
+	// used to silently drop params because `osc8.capabilities` was zeroed
+	// for the not-a-tty stdout path. After decoupling capabilities from
+	// stream TTY state, params are emitted correctly.
+	beforeEach(() => {
+		vi.resetModules();
+	});
+	afterEach(() => {
+		vi.unstubAllEnvs();
+		vi.unstubAllGlobals();
+		vi.resetModules();
+	});
+
+	it("emits params when targeting stderr even when stdout is piped", async () => {
+		vi.stubGlobal("process", {
+			...process,
+			env: {
+				...process.env,
+				TERM_PROGRAM: "iTerm.app",
+				TERM_PROGRAM_VERSION: "3.5.0",
+			},
+			stdout: { ...process.stdout, isTTY: false },
+			stderr: { ...process.stderr, isTTY: true },
+		});
+		const { link: linkFresh } = await import("../src/link.js");
+		const result = linkFresh("docs", URL, {
+			target: process.stderr,
+			params: { id: "n1" },
+		});
+		expect(result).toBe(`\x1b]8;id=n1;${URL}\x1b\\docs\x1b]8;;\x1b\\`);
 	});
 });

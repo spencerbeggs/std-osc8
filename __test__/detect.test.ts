@@ -113,6 +113,14 @@ describe("detect — terminal allowlist", () => {
 		expect(r.reason).toBe("terminal-unknown");
 		expect(r.terminal).toBe(null);
 	});
+	it("Alacritty (any version) is terminal-known-supported", () => {
+		// Regression: Alacritty's TERM=alacritty carries no version info,
+		// so a minVersion gate would always fire 'terminal-known-too-old'.
+		const r = detect(snapshot(envFor.alacritty() as NodeJS.ProcessEnv));
+		expect(r.supported).toBe(true);
+		expect(r.reason).toBe("terminal-known-supported");
+		expect(r.terminal).toBe("Alacritty");
+	});
 });
 
 describe("detect — capabilities", () => {
@@ -135,6 +143,51 @@ describe("detect — capabilities", () => {
 	it("zeros capabilities for known-unsupported terminals", () => {
 		const r = detect(snapshot(envFor.appleTerminal() as NodeJS.ProcessEnv));
 		expect(r.capabilities.params).toBe(false);
+	});
+	it("populates capabilities for known terminals even when stdout is not a TTY", () => {
+		// Capabilities are an intrinsic terminal property, decoupled from
+		// stream TTY state. A piped stdout doesn't change what the terminal
+		// can do — only whether we're emitting OSC8 right now.
+		const r = detect(snapshot(envFor.iterm() as NodeJS.ProcessEnv, false, true));
+		expect(r.supported).toBe(false);
+		expect(r.reason).toBe("not-a-tty");
+		expect(r.capabilities).toEqual({
+			params: true,
+			fileUrls: true,
+			fileUrlsRemoteUnsafe: false,
+		});
+	});
+	it("populates capabilities for known terminals even inside a wrapper", () => {
+		const r = detect(snapshot({ ...envFor.iterm(), TMUX: "x" } as NodeJS.ProcessEnv));
+		expect(r.supported).toBe(false);
+		expect(r.reason).toBe("wrapper-strips");
+		expect(r.capabilities.params).toBe(true);
+	});
+});
+
+describe("detect — supportedForStderr divergence", () => {
+	// These exercise the bug class the stderrSupported IIFE was fragile to:
+	// stdout and stderr can disagree only on TTY state; everything else
+	// (overrides, wrapper, allowlist) agrees by construction.
+	it("stdout-piped, stderr-TTY, known terminal: stderr supported, stdout not", () => {
+		const r = detect(snapshot(envFor.iterm() as NodeJS.ProcessEnv, false, true));
+		expect(r.supported).toBe(false);
+		expect(r.supportedForStderr).toBe(true);
+	});
+	it("FORCE_HYPERLINK lifts both streams regardless of TTY", () => {
+		const r = detect(snapshot({ FORCE_HYPERLINK: "1" }, false, false));
+		expect(r.supported).toBe(true);
+		expect(r.supportedForStderr).toBe(true);
+	});
+	it("NO_HYPERLINK disables both streams regardless of TTY", () => {
+		const r = detect(snapshot({ ...envFor.iterm(), NO_HYPERLINK: "1" } as NodeJS.ProcessEnv));
+		expect(r.supported).toBe(false);
+		expect(r.supportedForStderr).toBe(false);
+	});
+	it("terminal-known-too-old applies symmetrically to both streams", () => {
+		const r = detect(snapshot(envFor.iterm({ version: "3.0.0" }) as NodeJS.ProcessEnv));
+		expect(r.supported).toBe(false);
+		expect(r.supportedForStderr).toBe(false);
 	});
 });
 

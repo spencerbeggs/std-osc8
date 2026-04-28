@@ -181,66 +181,76 @@ Asymmetric cost favors "off" by default.
 
 ### Code Reference
 
-The ladder is implemented in `src/detect.ts`, lines 57-114. The structure is
-an explicit `if`/`else if` chain rather than a table-driven loop for two
-reasons:
+The ladder lives in `src/detect.ts`. The shared gate logic is extracted
+into a private `evaluateGate` helper that both stdout and stderr call:
 
-1. **Reason variable assignment.** Each branch assigns `supported`, `reason`,
-   `override`, and (sometimes) `capabilities`. A loop would obscure the
-   per-branch capability handling.
-2. **Stderr re-run.** The `stderrSupported` IIFE (lines 119-133) duplicates
-   the gate logic with `isStderrTTY`. Keeping the original chain explicit
-   makes the symmetry visible.
+```typescript
+const stdout = evaluateGate(isStdoutTTY, force, noHyperlink, noColor, wrapper, match);
+const stderr = evaluateGate(isStderrTTY, force, noHyperlink, noColor, wrapper, match);
+```
+
+This eliminates the previous IIFE-based duplication that mirrored the
+chain step-for-step. The two streams cannot drift: a new override or
+gate condition added to `evaluateGate` automatically applies to both.
 
 ### Key Code Excerpt
 
 ```typescript
-// src/detect.ts (essence)
-if (force) {
-  supported = true; reason = "force-env"; override = "force-hyperlink";
-  if (match?.entry.supported) capabilities = match.entry.capabilities;
-} else if (noHyperlink) {
-  supported = false; reason = "no-hyperlink-env"; override = "no-hyperlink";
-} else if (noColor) {
-  supported = false; reason = "no-color-env"; override = "no-color";
-} else if (!isStdoutTTY) {
-  supported = false; reason = "not-a-tty";
-} else if (wrapper) {
-  supported = false; reason = "wrapper-strips";
-} else if (match) {
-  if (!match.entry.supported) {
-    supported = false; reason = "terminal-known-unsupported";
-  } else if (
-    match.entry.minVersion &&
-    (match.identify.version === null
-      || compareSemver(match.identify.version, match.entry.minVersion) < 0)
-  ) {
-    supported = false; reason = "terminal-known-too-old";
-  } else {
-    supported = true; reason = "terminal-known-supported";
-    capabilities = match.entry.capabilities;
+// src/detect.ts (essence — the shared gate)
+const evaluateGate = (
+  isTTY: boolean,
+  force: boolean,
+  noHyperlink: boolean,
+  noColor: boolean,
+  wrapper: WrapperInfo | null,
+  match: TerminalMatch | null,
+): Gate => {
+  if (force) return { supported: true, reason: "force-env", override: "force-hyperlink" };
+  if (noHyperlink) return { supported: false, reason: "no-hyperlink-env", override: "no-hyperlink" };
+  if (noColor) return { supported: false, reason: "no-color-env", override: "no-color" };
+  if (!isTTY) return { supported: false, reason: "not-a-tty", override: null };
+  if (wrapper) return { supported: false, reason: "wrapper-strips", override: null };
+  if (!match) return { supported: false, reason: "terminal-unknown", override: null };
+  if (!match.entry.supported) return { supported: false, reason: "terminal-known-unsupported", override: null };
+  if (match.entry.minVersion && (match.identify.version === null
+    || compareSemver(match.identify.version, match.entry.minVersion) < 0)) {
+    return { supported: false, reason: "terminal-known-too-old", override: null };
   }
-} else {
-  supported = false; reason = "terminal-unknown";
-}
+  return { supported: true, reason: "terminal-known-supported", override: null };
+};
 ```
 
-### Capability surfacing under FORCE
+### Capabilities are decoupled from gate result
 
-When `FORCE_HYPERLINK` wins, `capabilities` is filled from the matched
-terminal entry **only if** the terminal was found and is marked `supported`
-in the allowlist. Otherwise capabilities stay `NO_CAPS` (all-false). This
-means:
+`Osc8Info.capabilities` is an **intrinsic property of the matched
+terminal**, not a function of the gate result. It is populated as:
 
-- iTerm + `FORCE` → capabilities reflect iTerm's true capabilities
-  (`params: true`, etc.).
-- Apple Terminal (allowlist `supported: false`) + `FORCE` → capabilities are
-  `NO_CAPS` because we don't actually know what Apple Terminal would do.
-- Unknown terminal + `FORCE` → capabilities are `NO_CAPS`.
+```typescript
+const capabilities = match?.entry.capabilities ?? NO_CAPS;
+```
 
-This carve-out is useful for `link()`: when `osc8.capabilities.params` is
-true, it serializes `id=` etc.; when false, it drops them. Forcing on an
-unknown terminal won't accidentally emit `params` the terminal can't parse.
+This is independent of `supported`, `reason`, TTY state, wrapper presence,
+or any override. The decoupling matters most for `link()` callers
+targeting stderr: a piped stdout that triggers `not-a-tty` does not
+zero out the terminal's intrinsic params capability, so
+`link("text", url, { target: process.stderr, params: { id: "n1" } })`
+correctly emits the `id=n1` param when targeting an iTerm stderr even
+when stdout is redirected.
+
+Examples:
+
+- iTerm + stdout-piped → `supported: false`, `reason: "not-a-tty"`,
+  `capabilities: { params: true, fileUrls: true, ... }` (terminal-level).
+- iTerm + tmux → `supported: false`, `reason: "wrapper-strips"`,
+  `capabilities: { params: true, ... }`.
+- Apple Terminal (allowlist `supported: false`) → `capabilities` are
+  Apple Terminal's NO_CAPS (already declared in the allowlist row).
+- Unknown terminal → `match` is null → `capabilities: NO_CAPS`.
+
+The `link()` formatter uses `osc8.capabilities.params` to decide whether
+to serialize `params`. Combined with the explicit `enabled: true`
+carve-out (which trusts the caller fully), this gives correct emission
+in all combinations of TTY state, override, and target stream.
 
 ### Override Field
 
@@ -288,6 +298,15 @@ This bypasses `readProcessSnapshot()` entirely, keeping tests hermetic.
 - iTerm + version below 3.1.0 → `terminal-known-too-old`
 - Apple Terminal → `terminal-known-unsupported`
 - VTE without `VTE_VERSION` parseable → `terminal-known-too-old`
+- iTerm + stdout-piped → off + `not-a-tty`, but `capabilities` still
+  reflect iTerm's intrinsic capabilities (regression test for the
+  capabilities-decoupling fix)
+- iTerm + stdout-piped + stderr-TTY → `supported: false`,
+  `supportedForStderr: true` (regression test for
+  stdout/stderr divergence; also proves the shared-gate refactor)
+- Alacritty (`TERM=alacritty`, no version env var) → on +
+  `terminal-known-supported` (regression test: previously got
+  `terminal-known-too-old` due to a misplaced `minVersion`)
 
 ### Integration Tests
 

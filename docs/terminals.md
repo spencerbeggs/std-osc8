@@ -54,7 +54,7 @@ Listed in match order. Columns:
 | 8 | Hyper | `TERM_PROGRAM=Hyper` | 3.0.0 | no | yes | Version from `TERM_PROGRAM_VERSION`. |
 | 9 | mintty | `TERM_PROGRAM=mintty` | 3.6.0 | yes | yes | MSYS2/Cygwin/Git Bash. |
 | 10 | WindowsTerminal | `WT_SESSION` set | any | no | yes | All current versions support OSC8. |
-| 11 | Alacritty | `TERM=alacritty` | 0.13.0 | no | yes | TERM-based identification; no version env exposed (see "version-encoded entries" caveat). |
+| 11 | Alacritty | `TERM=alacritty` | any | no | yes | TERM-based identification with no version env exposed; minVersion is intentionally `null` because gating with no version source would block every Alacritty user. Pre-0.11 Alacritty (Oct 2022) is vanishingly rare; affected users can opt out via `NO_HYPERLINK=1`. |
 | 12 | Ghostty | `TERM_PROGRAM=ghostty` | any | yes | yes | Lowercase value. |
 | 13 | JediTerm | `TERMINAL_EMULATOR=JetBrains-JediTerm` | any | no | yes | IntelliJ, PyCharm, WebStorm, Rider, etc. |
 | 14 | Tabby | `TERM_PROGRAM=Tabby` | any | yes | yes | |

@@ -103,7 +103,7 @@ shows the env vars consulted by its `identify()` function.
 | 8 | Hyper | `TERM_PROGRAM=Hyper` | yes | 3.0.0 | no | yes | no |
 | 9 | mintty | `TERM_PROGRAM=mintty` | yes | 3.6.0 | yes | yes | no |
 | 10 | WindowsTerminal | `WT_SESSION` set | yes | any | no | yes | no |
-| 11 | Alacritty | `TERM=alacritty` | yes | 0.13.0 | no | yes | no |
+| 11 | Alacritty | `TERM=alacritty` | yes | any | no | yes | no |
 | 12 | Ghostty | `TERM_PROGRAM=ghostty` | yes | any | yes | yes | no |
 | 13 | JediTerm | `TERMINAL_EMULATOR=JetBrains-JediTerm` | yes | any | no | yes | no |
 | 14 | Tabby | `TERM_PROGRAM=Tabby` | yes | any | yes | yes | no |

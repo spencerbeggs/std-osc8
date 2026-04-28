@@ -181,13 +181,19 @@ const TERMINALS: readonly TerminalEntry[] = [
 		capabilities: { params: false, fileUrls: true, fileUrlsRemoteUnsafe: false },
 	},
 	{
-		// Alacritty — supports OSC8 since 0.13.
+		// Alacritty — supports OSC8 since 0.11 (Oct 2022), with broader
+		// fixes in 0.13 (Jan 2024).
 		// Identified by TERM=alacritty.
 		// Source: https://github.com/Alhadis/OSC8-Adoption (Alacritty row)
+		//
+		// minVersion is intentionally null: TERM=alacritty carries no version
+		// information, so any minVersion would gate every Alacritty user as
+		// "terminal-known-too-old". Pre-0.11 users (vanishingly rare in 2026)
+		// can opt out via NO_HYPERLINK=1.
 		name: "Alacritty",
 		identify: (env) => (env.TERM === "alacritty" ? { version: null, rawIdentifier: env.TERM } : null),
 		supported: true,
-		minVersion: "0.13.0",
+		minVersion: null,
 		capabilities: { params: false, fileUrls: true, fileUrlsRemoteUnsafe: false },
 	},
 	{

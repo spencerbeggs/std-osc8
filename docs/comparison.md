@@ -38,7 +38,7 @@ Differences vs `std-osc8`:
 - **Allowlist depth.** `std-osc8` ships a hand-curated 21-entry
   [allowlist](./terminals.md) with explicit `minVersion` thresholds for
   every entry that has one (e.g., iTerm 3.1+, VTE 0.50.0+, vscode 1.71+,
-  Konsole 22.4+, mintty 3.6+, Alacritty 0.13+) and parsers for the
+  Konsole 22.4+, mintty 3.6+) and parsers for the
   packed-integer version env vars used by VTE and Konsole.
   `supports-hyperlinks` covers a smaller set (iTerm, WezTerm, vscode,
   ghostty, zed, plus Alacritty / kitty by `TERM` and VTE-based by

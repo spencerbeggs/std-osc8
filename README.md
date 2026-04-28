@@ -1,9 +1,10 @@
 # std-osc8
 
-Detect terminal hyperlink (OSC8) support and emit hyperlinks (or graceful
-fallbacks). A focused, sync, ESM-only complement to
-[`unjs/std-env`](https://github.com/unjs/std-env). Zero runtime
-dependencies.
+[![npm version](https://img.shields.io/npm/v/reposets)](https://www.npmjs.com/package/std-osc8)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue.svg)](https://www.typescriptlang.org/)
+
+Detect terminal hyperlink (OSC8) support and emit hyperlinks (or graceful fallbacks). A focused, sync, ESM-only complement to [`unjs/std-env`](https://github.com/unjs/std-env). Zero runtime dependencies.
 
 ```ts
 import { link } from "std-osc8";
@@ -16,11 +17,7 @@ console.log(link("the docs", "https://example.com"));
 //   the docs (https://example.com)
 ```
 
-`std-osc8` does the detection for you. You write `link(label, url)` once,
-and it picks the right rendering across iTerm2, WezTerm, kitty, VS Code,
-Windows Terminal, GNOME Terminal, Konsole, mintty, and 13 other
-identifiable terminals — falling back to plain text inside `tmux` /
-`screen`, in CI, when stdout is piped, or when `NO_COLOR` is set.
+`std-osc8` does the detection for you. You write `link(label, url)` once, and it picks the right rendering across iTerm2, WezTerm, kitty, VS Code, Windows Terminal, GNOME Terminal, Konsole, mintty, and 13 other identifiable terminals — falling back to plain text inside `tmux` / `screen`, in CI, when stdout is piped, or when `NO_COLOR` is set.
 
 ## Install
 
@@ -106,8 +103,7 @@ link("docs", "https://example.com", { enabled: false }); // always use fallback
 
 Precedence: `FORCE_HYPERLINK > NO_HYPERLINK > NO_COLOR > not-a-TTY > wrapper > terminal allowlist`.
 
-See [Detection Algorithm](./docs/detection.md) for the full 7-rule ladder
-and the rationale per rule.
+See [Detection Algorithm](./docs/detection.md) for the full 7-rule ladder and the rationale per rule.
 
 ## Documentation
 
@@ -120,4 +116,4 @@ and the rationale per rule.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](./LICENSE)

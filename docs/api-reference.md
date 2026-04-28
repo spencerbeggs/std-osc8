@@ -26,17 +26,9 @@ Every export from `std-osc8`, with full signatures, options, and examples.
 
 ## Eager constants
 
-The eager constants are computed **once at module import** by running the
-detection algorithm against a snapshot of `process.env` and the
-`isTTY` flags of `process.stdout` and `process.stderr`. They are zero-overhead
-to read and tree-shakable.
+The eager constants are computed **once at module import** by running the detection algorithm against a snapshot of `process.env` and the `isTTY` flags of `process.stdout` and `process.stderr`. They are zero-overhead to read and tree-shakable.
 
-> Eager-at-import means: if your code mutates `process.env` after `std-osc8`
-> has been loaded, the constants will not change. The function form
-> [`supportsHyperlinksFor`](#supportshyperlinksfor) reuses that env snapshot
-> as well; if you need to fully re-evaluate against a new env, you currently
-> need to drive detection yourself. See [Detection Algorithm](./detection.md)
-> for the caching semantics.
+> Eager-at-import means: if your code mutates `process.env` after `std-osc8` has been loaded, the constants will not change. The function form [`supportsHyperlinksFor`](#supportshyperlinksfor) reuses that env snapshot as well; if you need to fully re-evaluate against a new env, you currently need to drive detection yourself. See [Detection Algorithm](./detection.md) for the caching semantics.
 
 ### `supportsHyperlinks`
 
@@ -60,9 +52,7 @@ if (supportsHyperlinks) {
 const supportsHyperlinksStderr: boolean;
 ```
 
-The boolean verdict for `process.stderr`. Equivalent to
-`osc8.supportedForStderr`. The two diverge when one stream is a TTY and the
-other is not (e.g., piped stdout, TTY stderr).
+The boolean verdict for `process.stderr`. Equivalent to `osc8.supportedForStderr`. The two diverge when one stream is a TTY and the other is not (e.g., piped stdout, TTY stderr).
 
 ```ts
 import { supportsHyperlinksStderr } from "std-osc8";
@@ -93,15 +83,12 @@ console.error(`OSC8: ${osc8.supported} (${osc8.reason}) - ${osc8.explanation}`);
 function supportsHyperlinksFor(target: NodeJS.WriteStream | number): boolean;
 ```
 
-Re-runs the detection gate for a specific stream or numeric fd. The
-import-time env snapshot is reused; only the TTY flag varies.
+Re-runs the detection gate for a specific stream or numeric fd. The import-time env snapshot is reused; only the TTY flag varies.
 
 How `target` is resolved:
 
-- **WriteStream-like** (anything with an `.isTTY` property): the function
-  reads `target.isTTY` directly.
-- **fd `1` (stdout)**: uses the cached `isStdoutTTY` flag from the import-time
-  snapshot.
+- **WriteStream-like** (anything with an `.isTTY` property): the function reads `target.isTTY` directly.
+- **fd `1` (stdout)**: uses the cached `isStdoutTTY` flag from the import-time snapshot.
 - **fd `2` (stderr)**: uses the cached `isStderrTTY` flag.
 - **Any other fd**: queries `node:tty.isatty(fd)`.
 
@@ -122,9 +109,7 @@ supportsHyperlinksFor(3);              // arbitrary fd via node:tty.isatty
 function link(label: string, url: string, options?: LinkOptions): string;
 ```
 
-Render `label` as an OSC8 hyperlink to `url` when supported, or a configurable
-fallback rendering otherwise. Validates `params` regardless of detection
-outcome — see [Param validation](#param-validation).
+Render `label` as an OSC8 hyperlink to `url` when supported, or a configurable fallback rendering otherwise. Validates `params` regardless of detection outcome — see [Param validation](#param-validation).
 
 When OSC8 is supported, the emitted bytes are exactly:
 
@@ -132,9 +117,7 @@ When OSC8 is supported, the emitted bytes are exactly:
 \x1b]8;<params>;<url>\x1b\<label>\x1b]8;;\x1b\
 ```
 
-Where `<params>` is the colon-separated `key=value` pairs from
-`options.params` (or empty), and the trailing sequence is
-[`closeHyperlink`](#closehyperlink).
+Where `<params>` is the colon-separated `key=value` pairs from `options.params` (or empty), and the trailing sequence is [`closeHyperlink`](#closehyperlink).
 
 When OSC8 is not supported, the fallback is chosen by `options.fallback`:
 
@@ -149,13 +132,8 @@ When OSC8 is not supported, the fallback is chosen by `options.fallback`:
 The capability gate works as follows:
 
 - **By default**, `link()` calls `supportsHyperlinksFor(options.target ?? process.stdout)`.
-- **If `options.enabled` is set**, that boolean is used directly — no
-  detection is run for the gate.
-- **Params emission is gated** on `osc8.capabilities.params` (the detected
-  terminal's intrinsic capability — not affected by stream TTY state),
-  **except** when `options.enabled === true`. In that explicit-on case,
-  params are emitted unconditionally — useful for test rigs and forced-on
-  environments where you want full control.
+- **If `options.enabled` is set**, that boolean is used directly — no detection is run for the gate.
+- **Params emission is gated** on `osc8.capabilities.params` (the detected terminal's intrinsic capability — not affected by stream TTY state), **except** when `options.enabled === true`. In that explicit-on case, params are emitted unconditionally — useful for test rigs and forced-on environments where you want full control.
 
 Examples:
 
@@ -193,9 +171,7 @@ link("docs", "https://example.com", { target: process.stderr });
 function openHyperlink(url: string, params?: Osc8Params): string;
 ```
 
-Emit only the OSC8 **open** sequence introducing a hyperlink to `url`. Use
-this with [`closeHyperlink`](#closehyperlink) when the label is built
-incrementally.
+Emit only the OSC8 **open** sequence introducing a hyperlink to `url`. Use this with [`closeHyperlink`](#closehyperlink) when the label is built incrementally.
 
 The emitted bytes are exactly:
 
@@ -203,8 +179,7 @@ The emitted bytes are exactly:
 \x1b]8;<params>;<url>\x1b\
 ```
 
-`<params>` is empty if no params are passed, otherwise it is the
-colon-separated `key=value` serialization of `params`.
+`<params>` is empty if no params are passed, otherwise it is the colon-separated `key=value` serialization of `params`.
 
 ```ts
 import { openHyperlink } from "std-osc8";
@@ -219,9 +194,7 @@ openHyperlink("https://example.com", { id: "abc", foo: "bar" });
 // → "\x1b]8;id=abc:foo=bar;https://example.com\x1b\\"
 ```
 
-> Unlike `link()`, `openHyperlink()` always emits — it does not consult
-> detection. The caller decides whether to call it based on the function
-> form or eager constants.
+> Unlike `link()`, `openHyperlink()` always emits — it does not consult detection. The caller decides whether to call it based on the function form or eager constants.
 
 ### `closeHyperlink`
 
@@ -229,8 +202,7 @@ openHyperlink("https://example.com", { id: "abc", foo: "bar" });
 function closeHyperlink(): string;
 ```
 
-Emit the OSC8 **close** sequence, ending an in-progress hyperlink. The
-emitted bytes are always exactly:
+Emit the OSC8 **close** sequence, ending an in-progress hyperlink. The emitted bytes are always exactly:
 
 ```text
 \x1b]8;;\x1b\
@@ -244,17 +216,13 @@ closeHyperlink(); // → "\x1b]8;;\x1b\\"
 
 ### Param validation
 
-Both `link()` and `openHyperlink()` validate every value in `params`.
-Param values **must not** contain:
+Both `link()` and `openHyperlink()` validate every value in `params`. Param values **must not** contain:
 
 - `;` (terminator collision in the OSC8 sequence)
 - `:` (key/value separator collision)
 - Control characters (0x00–0x1F or 0x7F)
 
-If any value contains a forbidden character, a `TypeError` is thrown.
-Validation runs **even when the terminal does not support OSC8** — this
-gives callers consistent feedback regardless of detection state and prevents
-malformed sequences from sneaking through forced-on paths.
+If any value contains a forbidden character, a `TypeError` is thrown. Validation runs **even when the terminal does not support OSC8** — this gives callers consistent feedback regardless of detection state and prevents malformed sequences from sneaking through forced-on paths.
 
 ```ts
 import { link, openHyperlink } from "std-osc8";
@@ -330,8 +298,7 @@ type Osc8Reason =
   | "terminal-unknown";
 ```
 
-The discriminator on `Osc8Info`. Each value corresponds to one rule of the
-detection ladder:
+The discriminator on `Osc8Info`. Each value corresponds to one rule of the detection ladder:
 
 | Reason | When it fires |
 | --- | --- |
@@ -374,9 +341,7 @@ type KnownTerminal =
   | "Terminology";
 ```
 
-A tight string-literal union of every terminal in the allowlist. Use it for
-exhaustive switch statements or autocomplete-friendly comparisons. See
-[Terminal Allowlist](./terminals.md) for what each entry means.
+A tight string-literal union of every terminal in the allowlist. Use it for exhaustive switch statements or autocomplete-friendly comparisons. See [Terminal Allowlist](./terminals.md) for what each entry means.
 
 ```ts
 import { osc8, type KnownTerminal } from "std-osc8";
@@ -424,10 +389,7 @@ interface WrapperInfo {
 }
 ```
 
-Set when `osc8.wrapper` is non-null. `passesThrough` is **always `false`**
-because we cannot verify the multiplexer's version or passthrough config
-without spawning a subprocess. Users who know their tmux is configured
-correctly should set `FORCE_HYPERLINK=1`.
+Set when `osc8.wrapper` is non-null. `passesThrough` is **always `false`** because we cannot verify the multiplexer's version or passthrough config without spawning a subprocess. Users who know their tmux is configured correctly should set `FORCE_HYPERLINK=1`.
 
 ### `Osc8Params`
 
@@ -438,10 +400,7 @@ interface Osc8Params {
 }
 ```
 
-OSC8 link parameters. `id` is the standard parameter and is the field most
-consumers ever set, but arbitrary string-valued keys are allowed for
-terminal-specific extensions. `undefined` values are skipped during
-serialization.
+OSC8 link parameters. `id` is the standard parameter and is the field most consumers ever set, but arbitrary string-valued keys are allowed for terminal-specific extensions. `undefined` values are skipped during serialization.
 
 See [Param validation](#param-validation) for the constraints on values.
 

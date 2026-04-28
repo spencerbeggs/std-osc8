@@ -1,7 +1,6 @@
 # Getting Started
 
-This guide walks through installing `std-osc8`, the import patterns that match
-the 3-tier API, and four worked scenarios that cover most real-world uses.
+This guide walks through installing `std-osc8`, the import patterns that match the 3-tier API, and four worked scenarios that cover most real-world uses.
 
 ## Install
 
@@ -11,9 +10,7 @@ pnpm add std-osc8
 npm install std-osc8
 ```
 
-`std-osc8` is ESM-only and ships its own TypeScript types. It targets Node 24+
-per `devEngines`, but the runtime itself only relies on `process.env` and
-`node:tty`, both of which are available everywhere Node is.
+`std-osc8` is ESM-only and ships its own TypeScript types. It targets Node 24+ per `devEngines`, but the runtime itself only relies on `process.env` and `node:tty`, both of which are available everywhere Node is.
 
 ## Import patterns
 
@@ -47,22 +44,13 @@ import type {
 
 Pick the tier that matches your need:
 
-- **Tier 1 — eager constants.** `supportsHyperlinks`, `supportsHyperlinksStderr`,
-  and `osc8` are computed once at module import. Use these for the 95% case
-  where you check support at startup and never look back.
-- **Tier 2 — function form.** `supportsHyperlinksFor(streamOrFd)` re-runs the
-  detection gate against a specific stream or fd. Use this when you need a
-  per-stream answer (e.g., stdout is piped but stderr is a TTY) or for
-  arbitrary fds.
-- **Tier 3 — diagnostic record.** `osc8: Osc8Info` exposes the full reasoning
-  — terminal name, version, wrapper, capabilities, and a discriminated
-  `reason`. Use this for logging, debug commands, or "why didn't my link
-  render?" reports.
+- **Tier 1 — eager constants.** `supportsHyperlinks`, `supportsHyperlinksStderr`, and `osc8` are computed once at module import. Use these for the 95% case where you check support at startup and never look back.
+- **Tier 2 — function form.** `supportsHyperlinksFor(streamOrFd)` re-runs the detection gate against a specific stream or fd. Use this when you need a per-stream answer (e.g., stdout is piped but stderr is a TTY) or for arbitrary fds.
+- **Tier 3 — diagnostic record.** `osc8: Osc8Info` exposes the full reasoning — terminal name, version, wrapper, capabilities, and a discriminated `reason`. Use this for logging, debug commands, or "why didn't my link render?" reports.
 
 ## Scenario A: emit clickable links from a CLI
 
-The most common use. Just call `link()` — it auto-detects on `process.stdout`
-and falls back to readable plain text when OSC8 is unsupported.
+The most common use. Just call `link()` — it auto-detects on `process.stdout` and falls back to readable plain text when OSC8 is unsupported.
 
 ```ts
 import { link } from "std-osc8";
@@ -89,8 +77,7 @@ function renderError(message: string, helpUrl: string): string {
 
 ## Scenario C: emit only to stderr when stdout is piped
 
-Common when a CLI's stdout is being piped to a file or another process, but
-stderr is still a TTY (e.g., progress messages or warnings).
+Common when a CLI's stdout is being piped to a file or another process, but stderr is still a TTY (e.g., progress messages or warnings).
 
 ```ts
 import { supportsHyperlinksStderr, supportsHyperlinksFor, link } from "std-osc8";
@@ -112,9 +99,7 @@ if (supportsHyperlinksFor(process.stderr)) {
 
 ## Scenario D: streaming output (progress bars, wrapped labels)
 
-When the label is built up incrementally, use the open/close pair instead of
-`link()`. This is what you want for progress bars, word-wrapped text, or any
-case where the label spans multiple writes.
+When the label is built up incrementally, use the open/close pair instead of `link()`. This is what you want for progress bars, word-wrapped text, or any case where the label spans multiple writes.
 
 ```ts
 import {
@@ -137,28 +122,20 @@ function emitProgress(stream: NodeJS.WriteStream, url: string): void {
 }
 ```
 
-`openHyperlink(url)` emits `\x1b]8;;<url>\x1b\\` (with optional params before
-the URL). `closeHyperlink()` emits `\x1b]8;;\x1b\\`. Both are described in
-detail in [API Reference](./api-reference.md).
+`openHyperlink(url)` emits `\x1b]8;;<url>\x1b\\` (with optional params before the URL). `closeHyperlink()` emits `\x1b]8;;\x1b\\`. Both are described in detail in [API Reference](./api-reference.md).
 
 ## What about overrides?
 
-Three env vars influence detection. The full ladder lives in
-[Detection Algorithm](./detection.md), but the short version is:
+Three env vars influence detection. The full ladder lives in [Detection Algorithm](./detection.md), but the short version is:
 
-- `FORCE_HYPERLINK=1` — force hyperlinks on, even if the terminal isn't
-  detected as supporting them.
+- `FORCE_HYPERLINK=1` — force hyperlinks on, even if the terminal isn't detected as supporting them.
 - `NO_HYPERLINK=1` — force hyperlinks off.
-- `NO_COLOR=<anything non-empty>` — also forces hyperlinks off (per
-  [no-color.org](https://no-color.org)).
+- `NO_COLOR=<anything non-empty>` — also forces hyperlinks off (per [no-color.org](https://no-color.org)).
 
-`FORCE_HYPERLINK` wins over `NO_HYPERLINK` which wins over `NO_COLOR`. If you
-want "no color but yes hyperlinks", set both `NO_COLOR=1` and
-`FORCE_HYPERLINK=1`.
+`FORCE_HYPERLINK` wins over `NO_HYPERLINK` which wins over `NO_COLOR`. If you want "no color but yes hyperlinks", set both `NO_COLOR=1` and `FORCE_HYPERLINK=1`.
 
 ## Next steps
 
 - [API Reference](./api-reference.md) — full signature for every export.
 - [Detection Algorithm](./detection.md) — every rule, every reason code.
-- [Troubleshooting](./troubleshooting.md) — when something does not work the
-  way you expect.
+- [Troubleshooting](./troubleshooting.md) — when something does not work the way you expect.

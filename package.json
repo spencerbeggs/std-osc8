@@ -1,6 +1,6 @@
 {
 	"name": "std-osc8",
-	"version": "0.0.0",
+	"version": "0.1.0",
 	"private": true,
 	"description": "Detect terminal hyperlink capabilities of the active terminal from environmental variables",
 	"keywords": [

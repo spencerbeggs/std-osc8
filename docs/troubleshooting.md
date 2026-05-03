@@ -27,7 +27,7 @@ Then export the override:
 export FORCE_HYPERLINK=1
 ```
 
-For older tmux, or if you don't control `~/.tmux.conf`, your only option is to render the fallback. The `std-osc8` design intentionally trades automation for predictability here — see [`out-of-scope.md`](../.claude/design/std-osc8/out-of-scope.md).
+For older tmux, or if you don't control `~/.tmux.conf`, your only option is to render the fallback. The `std-osc8` design intentionally trades automation for predictability here.
 
 ## `NO_COLOR=0` is disabling hyperlinks
 
@@ -83,7 +83,7 @@ If you are unsure whether your CI renders OSC8, leave it off — the fallback re
    export FORCE_HYPERLINK=1
    ```
 
-2. **Submit an allowlist entry.** If your terminal has a stable identifying env var, file an issue or PR. See [Terminal Allowlist → Adding a new terminal](./terminals.md#adding-a-new-terminal). Cite the [Alhadis/OSC8-Adoption](https://github.com/Alhadis/OSC8-Adoption) row.
+2. **Submit an allowlist entry.** If your terminal has a stable identifying env var, file an issue or PR. See [Terminal allowlist → Adding a new terminal](./terminals.md#adding-a-new-terminal). Cite the [Alhadis/OSC8-Adoption](https://github.com/Alhadis/OSC8-Adoption) row.
 
 ## `supportsHyperlinksFor(3)` returns false even though fd 3 is a TTY
 
@@ -134,7 +134,7 @@ const encodedId = encodeURIComponent(rawId);
 
 **Symptom.** You set or modified `process.env.FORCE_HYPERLINK` after importing `std-osc8`, but `supportsHyperlinks` did not change.
 
-**Diagnosis.** The eager constants `supportsHyperlinks`, `supportsHyperlinksStderr`, and `osc8` are computed **once at module import**. They are frozen results, not live re-evaluations. Mutating `process.env` after import does not change them. See [Detection Algorithm → Caching semantics](./detection.md#caching-semantics).
+**Diagnosis.** The eager constants `supportsHyperlinks`, `supportsHyperlinksStderr`, and `osc8` are computed **once at module import**. They are frozen results, not live re-evaluations. Mutating `process.env` after import does not change them. See [Detection algorithm → Caching semantics](./detection.md#caching-semantics).
 
 **Fix.** Use [`supportsHyperlinksFor`](./api-reference.md#supportshyperlinksfor), which re-evaluates against the current process state on each call. For override env vars specifically, you can also read `process.env` directly:
 
@@ -166,6 +166,6 @@ The source `package.json` keeps `"private": true` so that an accidental `npm pub
 
 ## Related
 
-- [Detection Algorithm](./detection.md) — the full ladder and override semantics.
-- [Terminal Allowlist](./terminals.md) — what gets recognized and how to add new entries.
-- [API Reference](./api-reference.md) — full export signatures.
+- [Detection algorithm](./detection.md) — the full ladder and override semantics.
+- [Terminal allowlist](./terminals.md) — what gets recognized and how to add new entries.
+- [API reference](./api-reference.md) — full export signatures.

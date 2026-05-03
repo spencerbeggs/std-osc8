@@ -1,8 +1,6 @@
-# Terminal Allowlist
+# Terminal allowlist
 
 `std-osc8` recognizes terminal emulators via a hand-curated allowlist defined in [`src/terminals.ts`](../src/terminals.ts). This page documents every entry, how identification works, and how to contribute a new one.
-
-For the rationale (why allowlist instead of heuristics, why per-entry `identify()` functions, why `minVersion` is permissive on parse failure), see the design doc at [`.claude/design/std-osc8/terminal-allowlist.md`](../.claude/design/std-osc8/terminal-allowlist.md).
 
 ## Allowlist overview
 
@@ -109,7 +107,6 @@ The contributor flow:
 
 ## Related
 
-- [API Reference: `KnownTerminal`](./api-reference.md#knownterminal) — the string-literal union of allowlist entries.
-- [Detection Algorithm](./detection.md) — where rule 6 consults the allowlist.
-- Design doc: [`.claude/design/std-osc8/terminal-allowlist.md`](../.claude/design/std-osc8/terminal-allowlist.md).
+- [API reference: `KnownTerminal`](./api-reference.md#knownterminal) — the string-literal union of allowlist entries.
+- [Detection algorithm](./detection.md) — where rule 6 consults the allowlist.
 - [Alhadis/OSC8-Adoption](https://github.com/Alhadis/OSC8-Adoption) — the community tracker.

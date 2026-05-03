@@ -1,10 +1,8 @@
-# Detection Algorithm
+# Detection algorithm
 
 `std-osc8` decides whether to emit OSC8 hyperlinks by walking a 7-rule precedence ladder. Detection is deterministic and pure: the same snapshot of `process.env` and `isTTY` flags always produces the same `Osc8Info`.
 
 This page documents the ladder, the override env vars, wrapper handling, and the reason codes you can use to debug a verdict.
-
-For the rationale layer (why these rules in this order, why "off" by default, why no subprocess spawning), see the design doc at [`.claude/design/std-osc8/detection-precedence.md`](../.claude/design/std-osc8/detection-precedence.md).
 
 ## The precedence ladder
 
@@ -26,7 +24,7 @@ The first rule that matches wins; remaining rules are skipped. If no rule produc
 - **Why `FORCE_HYPERLINK` overrides `NO_HYPERLINK`.** Force wins because it is the ultimate user override. If a user sets both, they probably set `NO_HYPERLINK` in some shared shell config and `FORCE_HYPERLINK` in the current invocation; the recent one should win, and the cleanest rule for that is "force always wins."
 - **Why `NO_COLOR=0` is still treated as truthy.** Per [no-color.org](https://no-color.org), any non-empty value of `NO_COLOR` means the user wants color suppressed. The empty string and an unset variable are the only falsy cases. This catches users who set `NO_COLOR=0` thinking it disables the disable; it does not.
 - **Why "not a TTY" beats the allowlist.** Even if the env screams "iTerm," the immediate consumer of the bytes is whatever stdout is connected to. When that is `grep`, `tee`, or a file descriptor handed to a child process, emitting OSC8 produces visible garbage.
-- **Why wrappers default to off.** Both `tmux` and `screen` have config knobs that determine whether OSC8 sequences pass through. Verifying those configs requires spawning subprocesses, which is intentionally [out of scope](../.claude/design/std-osc8/out-of-scope.md). The conservative default is "off"; users who know their multiplexer is configured correctly use `FORCE_HYPERLINK=1`.
+- **Why wrappers default to off.** Both `tmux` and `screen` have config knobs that determine whether OSC8 sequences pass through. Verifying those configs requires spawning subprocesses, which is intentionally out of scope. The conservative default is "off"; users who know their multiplexer is configured correctly use `FORCE_HYPERLINK=1`.
 - **Why the allowlist is last.** The allowlist is the most informative signal but also the most brittle. Putting it last lets the cheaper, faster checks (override + TTY + wrapper) short-circuit common cases.
 
 ## Override env vars
@@ -78,7 +76,7 @@ When `TMUX` or `STY` is set, `osc8.wrapper` is populated:
 { name: "screen", passesThrough: false }
 ```
 
-`passesThrough` is **always `false`** in the current implementation. This is not a claim that the wrapper definitely strips OSC8 — it is a claim that we cannot verify from env alone whether it passes through. Spawning `tmux -V` and parsing `tmux show-options -g allow-passthrough` is intentionally out of scope. See [`out-of-scope.md`](../.claude/design/std-osc8/out-of-scope.md).
+`passesThrough` is **always `false`** in the current implementation. This is not a claim that the wrapper definitely strips OSC8 — it is a claim that we cannot verify from env alone whether it passes through. Spawning `tmux -V` and parsing `tmux show-options -g allow-passthrough` is intentionally out of scope.
 
 The escape hatch for tmux >= 3.4 users with `set -g allow-passthrough on`:
 
@@ -151,7 +149,6 @@ Re-exporting `detect()` and `readProcessSnapshot()` for full programmatic re-eva
 
 ## Related
 
-- [API Reference](./api-reference.md) — full export signatures and types.
-- [Terminal Allowlist](./terminals.md) — what rule 6 matches against.
+- [API reference](./api-reference.md) — full export signatures and types.
+- [Terminal allowlist](./terminals.md) — what rule 6 matches against.
 - [Troubleshooting](./troubleshooting.md) — concrete fixes for unexpected verdicts.
-- Design doc: [`.claude/design/std-osc8/detection-precedence.md`](../.claude/design/std-osc8/detection-precedence.md).

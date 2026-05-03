@@ -1,8 +1,9 @@
 # std-osc8
 
-[![npm version](https://img.shields.io/npm/v/reposets)](https://www.npmjs.com/package/std-osc8)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue.svg)](https://www.typescriptlang.org/)
+[![npm](https://img.shields.io/npm/v/std-osc8?label=npm&color=cb3837)](https://www.npmjs.com/package/std-osc8)
+[![License: MIT](https://img.shields.io/badge/License-MIT-4caf50.svg)](https://opensource.org/licenses/MIT)
+[![Node.js %3E%3D24](https://img.shields.io/badge/Node.js-%3E%3D24-5fa04e.svg)](https://nodejs.org/)
+[![TypeScript 5.9](https://img.shields.io/badge/TypeScript-5.9-3178c6.svg)](https://www.typescriptlang.org/)
 
 Detect terminal hyperlink (OSC8) support and emit hyperlinks (or graceful fallbacks). A focused, sync, ESM-only complement to [`unjs/std-env`](https://github.com/unjs/std-env). Zero runtime dependencies.
 
@@ -19,11 +20,9 @@ console.log(link("the docs", "https://example.com"));
 
 `std-osc8` does the detection for you. You write `link(label, url)` once, and it picks the right rendering across iTerm2, WezTerm, kitty, VS Code, Windows Terminal, GNOME Terminal, Konsole, mintty, and 13 other identifiable terminals — falling back to plain text inside `tmux` / `screen`, in CI, when stdout is piped, or when `NO_COLOR` is set.
 
-## Install
+## Installation
 
 ```bash
-pnpm add std-osc8
-# or
 npm install std-osc8
 ```
 
@@ -103,15 +102,15 @@ link("docs", "https://example.com", { enabled: false }); // always use fallback
 
 Precedence: `FORCE_HYPERLINK > NO_HYPERLINK > NO_COLOR > not-a-TTY > wrapper > terminal allowlist`.
 
-See [Detection Algorithm](./docs/detection.md) for the full 7-rule ladder and the rationale per rule.
+See [Detection algorithm](./docs/detection.md) for the full 7-rule ladder and the rationale per rule.
 
 ## Documentation
 
-- [Getting Started](./docs/getting-started.md) — install, mental model, four worked scenarios
-- [API Reference](./docs/api-reference.md) — every export and type with examples
-- [Detection Algorithm](./docs/detection.md) — precedence ladder, override semantics, reason codes
-- [Terminal Allowlist](./docs/terminals.md) — the 21 entries, sourcing, contributing
-- [Comparison with Similar Packages](./docs/comparison.md) — vs `supports-hyperlinks`, `terminal-link`, `ansi-escapes`, `std-env`
+- [Getting started](./docs/getting-started.md) — install, mental model, four worked scenarios
+- [API reference](./docs/api-reference.md) — every export and type with examples
+- [Detection algorithm](./docs/detection.md) — precedence ladder, override semantics, reason codes
+- [Terminal allowlist](./docs/terminals.md) — the 21 entries, sourcing, contributing
+- [Comparison with similar packages](./docs/comparison.md) — vs `supports-hyperlinks`, `terminal-link`, `ansi-escapes`, `std-env`
 - [Troubleshooting](./docs/troubleshooting.md) — common stumbling blocks with concrete fixes
 
 ## License

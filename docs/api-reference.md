@@ -1,4 +1,4 @@
-# API Reference
+# API reference
 
 Every export from `std-osc8`, with full signatures, options, and examples.
 
@@ -28,7 +28,7 @@ Every export from `std-osc8`, with full signatures, options, and examples.
 
 The eager constants are computed **once at module import** by running the detection algorithm against a snapshot of `process.env` and the `isTTY` flags of `process.stdout` and `process.stderr`. They are zero-overhead to read and tree-shakable.
 
-> Eager-at-import means: if your code mutates `process.env` after `std-osc8` has been loaded, the constants will not change. The function form [`supportsHyperlinksFor`](#supportshyperlinksfor) reuses that env snapshot as well; if you need to fully re-evaluate against a new env, you currently need to drive detection yourself. See [Detection Algorithm](./detection.md) for the caching semantics.
+> Eager-at-import means: if your code mutates `process.env` after `std-osc8` has been loaded, the constants will not change. The function form [`supportsHyperlinksFor`](#supportshyperlinksfor) reuses that env snapshot as well; if you need to fully re-evaluate against a new env, you currently need to drive detection yourself. See [Detection algorithm](./detection.md) for the caching semantics.
 
 ### `supportsHyperlinks`
 
@@ -268,7 +268,7 @@ interface Osc8Info {
 | `isStdoutTTY` | Whether stdout was a TTY at detection time. |
 | `isStderrTTY` | Whether stderr was a TTY at detection time. |
 | `override` | Which override env var produced the verdict, if any. `null` when no override fired. |
-| `capabilities` | Sub-feature capabilities of the matched terminal. **Decoupled from `supported`**: capabilities reflect what the detected terminal can intrinsically do, regardless of TTY state, wrapper, or override. A piped stdout that produces `supported: false` still surfaces the terminal's true `params`/`fileUrls` flags here. See [`Osc8Capabilities`](#osc8capabilities). |
+| `capabilities` | Sub-feature capabilities of the matched terminal. **Decoupled from `supported`**: capabilities reflect what the detected terminal can intrinsically do, regardless of TTY state, wrapper or override. A piped stdout that produces `supported: false` still surfaces the terminal's true `params`/`fileUrls` flags here. See [`Osc8Capabilities`](#osc8capabilities). |
 
 ```ts
 import { osc8 } from "std-osc8";
@@ -312,7 +312,7 @@ The discriminator on `Osc8Info`. Each value corresponds to one rule of the detec
 | `terminal-known-too-old` | The terminal matched the allowlist but its version is below `minVersion`, or its version could not be parsed. |
 | `terminal-unknown` | No allowlist entry matched. |
 
-See [Detection Algorithm](./detection.md) for the full rule-by-rule walkthrough.
+See [Detection algorithm](./detection.md) for the full rule-by-rule walkthrough.
 
 ### `KnownTerminal`
 
@@ -341,7 +341,7 @@ type KnownTerminal =
   | "Terminology";
 ```
 
-A tight string-literal union of every terminal in the allowlist. Use it for exhaustive switch statements or autocomplete-friendly comparisons. See [Terminal Allowlist](./terminals.md) for what each entry means.
+A tight string-literal union of every terminal in the allowlist. Use it for exhaustive switch statements or autocomplete-friendly comparisons. See [Terminal allowlist](./terminals.md) for what each entry means.
 
 ```ts
 import { osc8, type KnownTerminal } from "std-osc8";

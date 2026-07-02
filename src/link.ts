@@ -25,6 +25,8 @@ const serializeParams = (params: Osc8Params | undefined): string => {
  *
  * Use with `openHyperlink` for streaming output where the label is built
  * up incrementally between the open and close.
+ *
+ * @public
  */
 export const closeHyperlink = (): string => `${OSC}8;;${ST}`;
 
@@ -33,6 +35,8 @@ export const closeHyperlink = (): string => `${OSC}8;;${ST}`;
  *
  * Throws `TypeError` if a param value contains `;`, `:`, or control
  * characters. Validation runs even if the terminal does not support OSC8.
+ *
+ * @public
  */
 export const openHyperlink = (url: string, params?: Osc8Params): string =>
 	`${OSC}8;${serializeParams(params)};${url}${ST}`;
@@ -41,6 +45,8 @@ export const openHyperlink = (url: string, params?: Osc8Params): string =>
  * Render `label` as a hyperlink to `url` when OSC8 is supported, else
  * a configurable fallback rendering. Always validates `params` regardless
  * of whether OSC8 will actually be emitted.
+ *
+ * @public
  */
 export const link = (label: string, url: string, options?: LinkOptions): string => {
 	// Validate params first so malformed values throw even when emit is skipped.

@@ -2,6 +2,8 @@
  * The detected terminal program. One literal per allowlist entry in
  * src/terminals.ts. Kept as a tight union for autocomplete-friendly
  * comparisons (e.g. `osc8.terminal === "iTerm.app"`).
+ *
+ * @public
  */
 export type KnownTerminal =
 	| "iTerm.app"
@@ -28,6 +30,8 @@ export type KnownTerminal =
 
 /**
  * Why detection produced its verdict. The discriminator on `Osc8Info`.
+ *
+ * @public
  */
 export type Osc8Reason =
 	| "force-env"
@@ -43,6 +47,8 @@ export type Osc8Reason =
 /**
  * Sub-feature capabilities of the detected terminal. Always populated.
  * When the terminal is unknown or unsupported, all fields are `false`.
+ *
+ * @public
  */
 export interface Osc8Capabilities {
 	/** Terminal supports `id=` / `key=value` params. */
@@ -55,6 +61,8 @@ export interface Osc8Capabilities {
 
 /**
  * Multiplexer info, when detected.
+ *
+ * @public
  */
 export interface WrapperInfo {
 	readonly name: "tmux" | "screen";
@@ -68,6 +76,8 @@ export interface WrapperInfo {
 /**
  * The diagnostic info record. The eager `osc8` export and the per-stream
  * function-form result both follow this shape.
+ *
+ * @public
  */
 export interface Osc8Info {
 	/** Final boolean verdict for stdout. */
@@ -98,6 +108,8 @@ export interface Osc8Info {
 
 /**
  * OSC8 link parameters. Most consumers only ever set `id`.
+ *
+ * @public
  */
 export interface Osc8Params {
 	readonly id?: string;
@@ -106,6 +118,8 @@ export interface Osc8Params {
 
 /**
  * Options for the `link()` formatter helper.
+ *
+ * @public
  */
 export interface LinkOptions {
 	/** Override detection. When set, overrides per-stream auto-detection. */

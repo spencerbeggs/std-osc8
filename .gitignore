@@ -28,6 +28,7 @@ pnpm-release.json
 !.env.*.example
 
 # Claude AI files
+.claude/cache/
 .claude/settings.local.json
 .claude/plans/
 .claude/plugins-debug.log

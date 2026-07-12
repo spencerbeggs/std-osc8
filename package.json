@@ -69,7 +69,7 @@
 	},
 	"devDependencies": {
 		"@savvy-web/bundler": "^1.1.11",
-		"@savvy-web/silk": "^2.2.3",
+		"@savvy-web/silk": "^2.3.2",
 		"@types/node": "catalog:silk",
 		"@vitest-agent/plugin": "^1.1.8",
 		"typescript": "catalog:silk"

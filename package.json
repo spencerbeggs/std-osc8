@@ -68,8 +68,8 @@
 		"types:check": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"@savvy-web/bundler": "^2.1.14",
-		"@savvy-web/silk": "^3.7.9",
+		"@savvy-web/bundler": "^2.1.16",
+		"@savvy-web/silk": "^3.7.12",
 		"@types/node": "catalog:silk",
 		"@vitest-agent/plugin": "^2.3.0",
 		"typescript": "catalog:silk"

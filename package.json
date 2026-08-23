@@ -68,10 +68,10 @@
 		"types:check": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"@savvy-web/bundler": "^2.1.20",
-		"@savvy-web/silk": "^3.9.0",
+		"@savvy-web/bundler": "^2.1.21",
+		"@savvy-web/silk": "^3.9.1",
 		"@types/node": "catalog:silk",
-		"@vitest-agent/plugin": "^2.4.3",
+		"@vitest-agent/plugin": "^2.4.4",
 		"typescript": "catalog:silk"
 	},
 	"packageManager": "pnpm@11.22.0+sha512.1ff870c4c6133dfd88fb2afc46dd13d47f09c9794b438c6fdb47ca98caf3bc16381ee0be93a091b8e3824cf01f889f46d7d9e20910fb0be1ab0fb5baa80dd621",

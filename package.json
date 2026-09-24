@@ -69,10 +69,10 @@
 	},
 	"devDependencies": {
 		"@okfit/plugin": "^0.5.2",
-		"@savvy-web/bundler": "^2.4.9",
-		"@savvy-web/silk": "^4.2.7",
+		"@savvy-web/bundler": "^2.4.10",
+		"@savvy-web/silk": "^4.2.8",
 		"@types/node": "catalog:silk",
-		"@vitest-agent/plugin": "^4.1.6",
+		"@vitest-agent/plugin": "^4.1.7",
 		"typescript": "catalog:silk"
 	},
 	"engines": {

@@ -68,11 +68,11 @@
 		"types:check": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"@okfit/plugin": "^0.5.3",
-		"@savvy-web/bundler": "^2.4.13",
-		"@savvy-web/silk": "^4.2.11",
+		"@okfit/plugin": "^0.5.4",
+		"@savvy-web/bundler": "^2.4.15",
+		"@savvy-web/silk": "^4.2.13",
 		"@types/node": "catalog:silk",
-		"@vitest-agent/plugin": "^5.0.1",
+		"@vitest-agent/plugin": "^5.0.2",
 		"typescript": "catalog:silk"
 	},
 	"engines": {
@@ -81,7 +81,7 @@
 	"devEngines": {
 		"packageManager": {
 			"name": "pnpm",
-			"version": "12.6.0",
+			"version": "12.8.1",
 			"onFail": "download"
 		},
 		"runtime": [

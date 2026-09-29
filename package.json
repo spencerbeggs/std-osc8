@@ -69,8 +69,8 @@
 	},
 	"devDependencies": {
 		"@okfit/plugin": "^0.5.5",
-		"@savvy-web/bundler": "^2.4.15",
-		"@savvy-web/silk": "^4.2.13",
+		"@savvy-web/bundler": "^2.4.16",
+		"@savvy-web/silk": "^4.2.14",
 		"@types/node": "catalog:silk",
 		"@vitest-agent/plugin": "^5.0.3",
 		"typescript": "catalog:silk"

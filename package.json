@@ -68,7 +68,7 @@
 		"types:check": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"@okfit/plugin": "^0.5.4",
+		"@okfit/plugin": "^0.5.5",
 		"@savvy-web/bundler": "^2.4.15",
 		"@savvy-web/silk": "^4.2.13",
 		"@types/node": "catalog:silk",

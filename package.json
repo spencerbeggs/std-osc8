@@ -72,7 +72,7 @@
 		"@savvy-web/bundler": "^2.4.17",
 		"@savvy-web/silk": "^4.3.0",
 		"@types/node": "catalog:silk",
-		"@vitest-agent/plugin": "^5.1.0",
+		"@vitest-agent/plugin": "^5.1.1",
 		"typescript": "catalog:silk"
 	},
 	"engines": {
@@ -81,7 +81,7 @@
 	"devEngines": {
 		"packageManager": {
 			"name": "pnpm",
-			"version": "12.8.1",
+			"version": "12.8.2",
 			"onFail": "download"
 		},
 		"runtime": [

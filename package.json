@@ -70,7 +70,7 @@
 	"devDependencies": {
 		"@okfit/plugin": "^0.5.18",
 		"@savvy-web/bundler": "^2.5.2",
-		"@savvy-web/silk": "^4.3.9",
+		"@savvy-web/silk": "^4.3.10",
 		"@types/node": "catalog:silk",
 		"@vitest-agent/plugin": "^5.4.4",
 		"typescript": "catalog:silk"
@@ -81,7 +81,7 @@
 	"devEngines": {
 		"packageManager": {
 			"name": "pnpm",
-			"version": "12.12.1",
+			"version": "12.13.0",
 			"onFail": "download"
 		},
 		"runtime": [

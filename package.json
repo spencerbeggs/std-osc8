@@ -70,7 +70,7 @@
 		"@okfit/plugin": "^0.5.34",
 		"@savvy-web/silk": "^5.1.2",
 		"@types/node": "catalog:effected:build",
-		"@vitest-agent/plugin": "^6.0.11",
+		"@vitest-agent/plugin": "^6.0.12",
 		"typescript": "catalog:effected:build"
 	},
 	"engines": {

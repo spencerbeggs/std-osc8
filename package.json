@@ -68,9 +68,9 @@
 	"devDependencies": {
 		"@effected/plugin": "catalog:effected",
 		"@okfit/plugin": "^0.5.40",
-		"@savvy-web/silk": "^5.1.9",
+		"@savvy-web/silk": "^5.1.10",
 		"@types/node": "catalog:effected:build",
-		"@vitest-agent/plugin": "^6.1.1",
+		"@vitest-agent/plugin": "^6.2.0",
 		"typescript": "catalog:effected:build"
 	},
 	"engines": {

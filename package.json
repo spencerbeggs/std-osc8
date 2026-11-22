@@ -70,7 +70,7 @@
 		"@okfit/plugin": "^0.5.40",
 		"@savvy-web/silk": "^5.1.9",
 		"@types/node": "catalog:effected:build",
-		"@vitest-agent/plugin": "^6.1.0",
+		"@vitest-agent/plugin": "^6.1.1",
 		"typescript": "catalog:effected:build"
 	},
 	"engines": {
@@ -79,7 +79,7 @@
 	"devEngines": {
 		"packageManager": {
 			"name": "pnpm",
-			"version": "12.22.0",
+			"version": "12.23.0",
 			"onFail": "download"
 		},
 		"runtime": [
